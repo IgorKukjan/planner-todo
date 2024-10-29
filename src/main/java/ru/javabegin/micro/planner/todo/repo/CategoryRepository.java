@@ -15,13 +15,13 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // поиск категорий пользователя (по названию)
-    List<Category> findByUserEmailOrderByTitleAsc(String email);
+    List<Category> findByUserIdOrderByTitleAsc(Long userId);
 
     // поиск значений по названию для конкретного пользователя
     @Query("SELECT c FROM Category c where " +
             "(:title is null or :title='' " + // если передадим параметр title пустым, то выберутся все записи (сработает именно это условие)
             " or lower(c.title) like lower(concat('%', :title,'%'))) " + // если параметр title не пустой, то выполнится уже это условие
-            " and c.user.email=:email  " + // фильтрация для конкретного пользователя
+            " and c.userId=:userId  " + // фильтрация для конкретного пользователя
             " order by c.title asc") // сортировка по названию
-    List<Category> findByTitle(@Param("title") String title, @Param("email") String email);
+    List<Category> findByTitle(@Param("title") String title, @Param("userId") Long userId);
 }

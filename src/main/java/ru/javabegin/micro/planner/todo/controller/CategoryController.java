@@ -35,8 +35,8 @@ public class CategoryController {
     }
 
     @PostMapping("/all")
-    public List<Category> findAll(@RequestBody String email) {
-        return categoryService.findAll(email);
+    public List<Category> findAll(@RequestBody Long userId) {
+        return categoryService.findAll(userId);
     }
 
 
@@ -103,12 +103,12 @@ public class CategoryController {
     public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues) {
 
         // проверка на обязательные параметры
-        if (categorySearchValues.getEmail() == null || categorySearchValues.getEmail().trim().length() == 0) {
-            return new ResponseEntity("missed param: email", HttpStatus.NOT_ACCEPTABLE);
+        if (categorySearchValues.getUserId() == null || categorySearchValues.getUserId() == 0) {
+            return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 
         // поиск категорий пользователя по названию
-        List<Category> list = categoryService.findByTitle(categorySearchValues.getTitle(), categorySearchValues.getEmail());
+        List<Category> list = categoryService.findByTitle(categorySearchValues.getTitle(), categorySearchValues.getUserId());
 
         return ResponseEntity.ok(list);
     }
