@@ -140,7 +140,7 @@ public class PriorityController {
 
         // проверка на обязательные параметры
         if (prioritySearchValues.getUserId() == null || prioritySearchValues.getUserId() == 0) {
-            return new ResponseEntity("missed param: email", HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 
         // если вместо текста будет пусто или null - вернутся все категории
