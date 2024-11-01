@@ -35,6 +35,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation 'ru.javabegin.micro.planner:planner-entity'
+    implementation 'ru.javabegin.micro.planner:planner-utils'
 
     //драйвер бд
     runtimeOnly 'org.postgresql:postgresql'
