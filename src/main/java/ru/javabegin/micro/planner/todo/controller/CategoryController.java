@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
 import ru.javabegin.micro.planner.todo.search.CategorySearchValues;
 import ru.javabegin.micro.planner.todo.service.CategoryService;
-import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.rest.webclient.UserWebClientBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,13 +33,15 @@ public class CategoryController {
 
     //микросервис для работы с пользователем
     private UserRestBuilder userRestBuilder;
+    private UserWebClientBuilder userWebClientBuilder;
 
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder) {
+    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
         this.categoryService = categoryService;
         this.userRestBuilder = userRestBuilder;
+        this.userWebClientBuilder = userWebClientBuilder;
     }
 
     @PostMapping("/all")
@@ -62,8 +65,12 @@ public class CategoryController {
         }
 
         //есть ли такой пользователь
-        if(userRestBuilder.userExists(category.getUserId())){
-              return ResponseEntity.ok(categoryService.add(category)); // возвращаем добавленный объект с заполненным ID
+//        if(userRestBuilder.userExists(category.getUserId())){
+//              return ResponseEntity.ok(categoryService.add(category)); // возвращаем добавленный объект с заполненным ID
+//        }
+
+        if(userWebClientBuilder.userExists(category.getUserId())){
+            return ResponseEntity.ok(categoryService.add(category)); // возвращаем добавленный объект с заполненным ID
         }
 
        //если пользователя не существует

@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
-import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.rest.webclient.UserWebClientBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,12 +38,14 @@ public class PriorityController {
 
     //микросервис для работы с пользователем
     private UserRestBuilder userRestBuilder;
+    private UserWebClientBuilder userWebClientBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder) {
+    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
         this.priorityService = priorityService;
         this.userRestBuilder = userRestBuilder;
+        this.userWebClientBuilder = userWebClientBuilder;
     }
 
 
@@ -72,8 +75,12 @@ public class PriorityController {
         }
 
         //есть ли такой пользователь
-        if(userRestBuilder.userExists(priority.getUserId())){
-            // save работает как на добавление, так и на обновление
+//        if(userRestBuilder.userExists(priority.getUserId())){
+//            // save работает как на добавление, так и на обновление
+//            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+//        }
+
+        if(userWebClientBuilder.userExists(priority.getUserId())){
             return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
         }
 
