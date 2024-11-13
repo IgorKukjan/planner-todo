@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
+import ru.javabegin.micro.planner.todo.feign.UserFeignClient;
 import ru.javabegin.micro.planner.todo.search.CategorySearchValues;
 import ru.javabegin.micro.planner.todo.service.CategoryService;
 import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
@@ -36,12 +37,20 @@ public class CategoryController {
     private UserWebClientBuilder userWebClientBuilder;
 
 
+    //клиент для вызова мс
+    private UserFeignClient userFeignClient;
+
+
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
+    public CategoryController(CategoryService categoryService
+                        , UserRestBuilder userRestBuilder
+                        , UserWebClientBuilder userWebClientBuilder
+                        , UserFeignClient userFeignClient) {
         this.categoryService = categoryService;
         this.userRestBuilder = userRestBuilder;
         this.userWebClientBuilder = userWebClientBuilder;
+        this.userFeignClient = userFeignClient;
     }
 
     @PostMapping("/all")
@@ -74,7 +83,11 @@ public class CategoryController {
 //        }
 
         //подписываемся на результат
-        userWebClientBuilder.userExistsAsync(category.getUserId()).subscribe(user -> System.out.println("user = " + user));
+//        userWebClientBuilder.userExistsAsync(category.getUserId()).subscribe(user -> System.out.println("user = " + user));
+
+        if(userFeignClient.findUserById(category.getUserId()) != null){
+            return ResponseEntity.ok(categoryService.add(category));
+        }
 
        //если пользователя не существует
         return new ResponseEntity("user id =" + category.getUserId() + " not found", HttpStatus.NOT_FOUND);
