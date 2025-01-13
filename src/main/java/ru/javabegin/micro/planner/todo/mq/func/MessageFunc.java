@@ -17,6 +17,13 @@ public class MessageFunc {
 
     @Bean
     public Consumer<Message<Long>> newUserActionConsume() {
-        return message -> testDataService.initTestData(message.getPayload());
+        Consumer<Message<Long>> consumer = message -> {
+//            System.out.println("test dlq");
+//            int a = 10, b = 0;
+//            System.out.println(a/b);
+
+            testDataService.initTestData(message.getPayload());
+        };
+        return consumer;
     }
 }
