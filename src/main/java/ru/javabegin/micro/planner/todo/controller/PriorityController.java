@@ -157,7 +157,7 @@ public class PriorityController {
     public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues) {
 
         // проверка на обязательные параметры
-        if (prioritySearchValues.getUserId() == null || prioritySearchValues.getUserId() == 0) {
+        if (prioritySearchValues.getUserId() == 0) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 

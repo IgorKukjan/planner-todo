@@ -1,87 +1,77 @@
-package ru.javabegin.micro.planner.todo.service;
+package ru.javabegin.micro.planner.todo.service
 
-import org.springframework.stereotype.Service;
-import ru.javabegin.micro.planner.entity.Category;
-import ru.javabegin.micro.planner.entity.Priority;
-import ru.javabegin.micro.planner.entity.Task;
-
-import java.util.Calendar;
-import java.util.Date;
+import org.springframework.stereotype.Service
+import ru.javabegin.micro.planner.entity.Category
+import ru.javabegin.micro.planner.entity.Priority
+import ru.javabegin.micro.planner.entity.Task
+import java.util.*
 
 @Service
-public class TestDataService {
+class TestDataService // используем автоматическое внедрение экземпляра класса через конструктор
+// не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
+    (
+    private val taskService: TaskService,
+    private val priorityService: PriorityService,
+    private val categoryService: CategoryService
+) {
+    fun initTestData(userId: Long) {
+        val prior1 = Priority()
+        prior1.color = "#fff"
+        prior1.title = "Важный"
+        prior1.userId = userId
 
-    private final TaskService taskService;
-    private final PriorityService priorityService;
-    private final CategoryService categoryService;
+        val prior2 = Priority()
+        prior2.color = "#ffе"
+        prior2.title = "Неважный"
+        prior2.userId = userId
 
-    // используем автоматическое внедрение экземпляра класса через конструктор
-    // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TestDataService(TaskService taskService, PriorityService priorityService, CategoryService categoryService) {
-        this.taskService = taskService;
-        this.priorityService = priorityService;
-        this.categoryService = categoryService;
-    }
-
-    public void initTestData(Long userId){
-        Priority prior1 = new Priority();
-        prior1.setColor("#fff");
-        prior1.setTitle("Важный");
-        prior1.setUserId(userId);
-
-        Priority prior2 = new Priority();
-        prior2.setColor("#ffе");
-        prior2.setTitle("Неважный");
-        prior2.setUserId(userId);
-
-        priorityService.add(prior1);
-        priorityService.add(prior2);
+        priorityService.add(prior1)
+        priorityService.add(prior2)
 
 
-        Category cat1 = new Category();
-        cat1.setTitle("Работа");
-        cat1.setUserId(userId);
+        val cat1 = Category()
+        cat1.title = "Работа"
+        cat1.userId = userId
 
-        Category cat2 = new Category();
-        cat2.setTitle("Семья");
-        cat2.setUserId(userId);
+        val cat2 = Category()
+        cat2.title = "Семья"
+        cat2.userId = userId
 
-        categoryService.add(cat1);
-        categoryService.add(cat2);
+        categoryService.add(cat1)
+        categoryService.add(cat2)
 
         // завтра
-        Date tomorrow = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(tomorrow);
-        c.add(Calendar.DATE, 1);
-        tomorrow = c.getTime();
+        var tomorrow = Date()
+        val c = Calendar.getInstance()
+        c.time = tomorrow
+        c.add(Calendar.DATE, 1)
+        tomorrow = c.time
 
         // неделя
-        Date oneWeek = new Date();
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(oneWeek);
-        c2.add(Calendar.DATE, 7);
-        oneWeek = c2.getTime();
+        var oneWeek = Date()
+        val c2 = Calendar.getInstance()
+        c2.time = oneWeek
+        c2.add(Calendar.DATE, 7)
+        oneWeek = c2.time
 
-        Task task1 = new Task();
-        task1.setTitle("Покушать");
-        task1.setCategory(cat1);
-        task1.setPriority(prior1);
-        task1.setCompleted(true);
-        task1.setTaskDate(tomorrow);
-        task1.setUserId(userId);
+        val task1 = Task()
+        task1.title = "Покушать"
+        task1.category = cat1
+        task1.priority = prior1
+        task1.completed = true
+        task1.taskDate = tomorrow
+        task1.userId = userId
 
-        Task task2 = new Task();
-        task2.setTitle("Поспать");
-        task2.setCategory(cat2);
-        task2.setCompleted(false);
-        task2.setPriority(prior2);
-        task2.setTaskDate(oneWeek);
-        task2.setUserId(userId);
+        val task2 = Task()
+        task2.title = "Поспать"
+        task2.category = cat2
+        task2.completed = false
+        task2.priority = prior2
+        task2.taskDate = oneWeek
+        task2.userId = userId
 
 
-        taskService.add(task1);
-        taskService.add(task2);
-
+        taskService.add(task1)
+        taskService.add(task2)
     }
 }

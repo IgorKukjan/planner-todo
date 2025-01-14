@@ -148,7 +148,7 @@ public class CategoryController {
     public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues) {
 
         // проверка на обязательные параметры
-        if (categorySearchValues.getUserId() == null || categorySearchValues.getUserId() == 0) {
+        if (categorySearchValues.getUserId() == 0) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 

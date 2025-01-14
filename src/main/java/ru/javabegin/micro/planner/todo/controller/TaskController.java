@@ -164,10 +164,10 @@ public class TaskController {
         String sortColumn = taskSearchValues.getSortColumn() != null ? taskSearchValues.getSortColumn() : null;
         String sortDirection = taskSearchValues.getSortDirection() != null ? taskSearchValues.getSortDirection() : null;
 
-        Integer pageNumber = taskSearchValues.getPageNumber() != null ? taskSearchValues.getPageNumber() : null;
-        Integer pageSize = taskSearchValues.getPageSize() != null ? taskSearchValues.getPageSize() : null;
+        Integer pageNumber = taskSearchValues.getPageNumber();
+        Integer pageSize = taskSearchValues.getPageSize();
 
-        Long userId = taskSearchValues.getUserId() != null ? taskSearchValues.getUserId() : null; // для показа задач только этого пользователя
+        Long userId = taskSearchValues.getUserId(); // для показа задач только этого пользователя
 
         // проверка на обязательные параметры
         if (userId == null || userId == 0) {

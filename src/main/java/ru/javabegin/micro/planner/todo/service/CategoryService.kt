@@ -1,57 +1,43 @@
-package ru.javabegin.micro.planner.todo.service;
+package ru.javabegin.micro.planner.todo.service
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import ru.javabegin.micro.planner.entity.Category;
-import ru.javabegin.micro.planner.todo.repo.CategoryRepository;
-
-import jakarta.transaction.Transactional;
-import java.util.List;
-
+import jakarta.transaction.Transactional
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
+import ru.javabegin.micro.planner.entity.Category
+import ru.javabegin.micro.planner.todo.repo.CategoryRepository
 
 // всегда нужно создавать отдельный класс Service для доступа к данным, даже если кажется,
 // что мало методов или это все можно реализовать сразу в контроллере
 // Такой подход полезен для будущих доработок и правильной архитектуры (особенно, если работаете с транзакциями)
-@Service
-
-// все методы класса должны выполниться без ошибки, чтобы транзакция завершилась
+@Service // все методы класса должны выполниться без ошибки, чтобы транзакция завершилась
 // если в методе выполняются несолько SQL запросов и возникнет исключение - то все выполненные операции откатятся (Rollback)
 @Transactional
-public class CategoryService {
-
-    // работает встроенный механизм DI из Spring, который при старте приложения подставит в эту переменную нужные класс-реализацию
-    private final CategoryRepository repository; // сервис имеет право обращаться к репозиторию (БД)
-
-    public CategoryService(CategoryRepository repository) {
-        this.repository = repository;
+class CategoryService(// работает встроенный механизм DI из Spring, который при старте приложения подставит в эту переменную нужные класс-реализацию
+    private val repository: CategoryRepository // сервис имеет право обращаться к репозиторию (БД)
+) {
+    fun findAll(userId: Long): List<Category> {
+        return repository.findByUserIdOrderByTitleAsc(userId)
     }
 
-    @Cacheable(cacheNames = "categories")
-    public List<Category> findAll(Long userId) {
-        return repository.findByUserIdOrderByTitleAsc(userId);
+    fun add(category: Category): Category {
+        return repository.save(category) // метод save обновляет или создает новый объект, если его не было
     }
 
-    public Category add(Category category) {
-        return repository.save(category); // метод save обновляет или создает новый объект, если его не было
+    fun update(category: Category): Category {
+        return repository.save(category) // метод save обновляет или создает новый объект, если его не было
     }
 
-    public Category update(Category category) {
-        return repository.save(category); // метод save обновляет или создает новый объект, если его не было
-    }
-
-    public void deleteById(Long id) {
-        repository.deleteById(id);
+    fun deleteById(id: Long) {
+        repository.deleteById(id)
     }
 
     // поиск категорий пользователя по названию
-    public List<Category> findByTitle(String text, Long userId) {
-        return repository.findByTitle(text, userId);
+    fun findByTitle(text: String?, userId: Long): List<Category> {
+        return repository.findByTitle(text, userId)
     }
 
     // поиск категории по ID
-    public Category findById(Long id) {
-        return repository.findById(id).get(); // т.к. возвращается Optional - можно получить объект методом get()
+    fun findById(id: Long): Category {
+        return repository.findById(id).get() // т.к. возвращается Optional - можно получить объект методом get()
     }
-
-
 }
