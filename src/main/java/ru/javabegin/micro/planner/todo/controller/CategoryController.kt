@@ -63,7 +63,7 @@ class CategoryController(// доступ к данным из БД
 //        userWebClientBuilder.userExistsAsync(category.getUserId()).subscribe(user -> System.out.println("user = " + user));
 
         // вызов мс через feign интерфейс
-        val result = userFeignClient.findUserById(category.userId)
+        val result = userFeignClient.findUserById(category.userId!!)
             ?: // если мс недоступен - вернется null
             return ResponseEntity<Any>(
                 "система пользователей недоступна, попробуйте позже",
