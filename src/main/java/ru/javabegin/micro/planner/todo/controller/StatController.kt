@@ -1,13 +1,11 @@
-package ru.javabegin.micro.planner.todo.controller;
+package ru.javabegin.micro.planner.todo.controller
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import ru.javabegin.micro.planner.entity.Stat;
-import ru.javabegin.micro.planner.todo.service.StatService;
-
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
+import ru.javabegin.micro.planner.entity.Stat
+import ru.javabegin.micro.planner.todo.service.StatService
 
 /*
 
@@ -22,27 +20,17 @@ import ru.javabegin.micro.planner.todo.service.StatService;
 Названия методов могут быть любыми, главное не дублировать их имена и URL mapping
 
 */
-
-@RestController
-// базовый URI не нужен, т.к. метод только один
-public class StatController {
-
-    private final StatService statService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
-
-    // используем автоматическое внедрение экземпляра класса через конструктор
-    // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public StatController(StatService statService) {
-        this.statService = statService;
-    }
-
-
+@RestController // базовый URI не нужен, т.к. метод только один
+class StatController // используем автоматическое внедрение экземпляра класса через конструктор
+// не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
+    (// сервис для доступа к данным (напрямую к репозиториям не обращаемся)
+    private val statService: StatService
+) {
     // для статистика всгда получаем только одну строку с id=1 (согласно таблице БД)
     @PostMapping("/stat")
-    public ResponseEntity<Stat> findByEmail(@RequestBody Long userId) {
-
+    fun findByEmail(@RequestBody userId: Long): ResponseEntity<Stat> {
         // можно не использовать ResponseEntity, а просто вернуть коллекцию, код все равно будет 200 ОК
-        return ResponseEntity.ok(statService.findStat(userId));
+
+        return ResponseEntity.ok(statService.findStat(userId))
     }
-
-
 }

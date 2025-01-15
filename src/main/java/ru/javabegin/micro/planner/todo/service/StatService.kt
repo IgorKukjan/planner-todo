@@ -14,7 +14,7 @@ import ru.javabegin.micro.planner.todo.repo.StatRepository
 class StatService(// сервис имеет право обращаться к репозиторию (БД)
     private val repository: StatRepository
 ) {
-    fun findStat(userId: Long): Stat {
+    fun findStat(userId: Long): Stat? {
         return repository.findByUserId(userId)
     }
 }

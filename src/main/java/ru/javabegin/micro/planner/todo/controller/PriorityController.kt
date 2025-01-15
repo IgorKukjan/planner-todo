@@ -1,18 +1,14 @@
-package ru.javabegin.micro.planner.todo.controller;
+package ru.javabegin.micro.planner.todo.controller
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.javabegin.micro.planner.entity.Priority;
-import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
-import ru.javabegin.micro.planner.todo.service.PriorityService;
-import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
-import ru.javabegin.micro.planner.utils.rest.webclient.UserWebClientBuilder;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import ru.javabegin.micro.planner.entity.Priority
+import ru.javabegin.micro.planner.todo.search.PrioritySearchValues
+import ru.javabegin.micro.planner.todo.service.PriorityService
+import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder
+import ru.javabegin.micro.planner.utils.rest.webclient.UserWebClientBuilder
 
 /*
 
@@ -27,51 +23,37 @@ import java.util.NoSuchElementException;
 Названия методов могут быть любыми, главное не дублировать их имена и URL mapping
 
 */
-
-
 @RestController
 @RequestMapping("/priority") // базовый URI
-public class PriorityController {
-
-    // доступ к данным из БД
-    private PriorityService priorityService;
-
-    //микросервис для работы с пользователем
-    private UserRestBuilder userRestBuilder;
-    private UserWebClientBuilder userWebClientBuilder;
-
-    // используем автоматическое внедрение экземпляра класса через конструктор
-    // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
-        this.priorityService = priorityService;
-        this.userRestBuilder = userRestBuilder;
-        this.userWebClientBuilder = userWebClientBuilder;
-    }
-
+class PriorityController(// доступ к данным из БД
+    private val priorityService: PriorityService, //микросервис для работы с пользователем
+    private val userRestBuilder: UserRestBuilder,
+    private val userWebClientBuilder: UserWebClientBuilder
+) {
 
     @PostMapping("/all")
-    public List<Priority> findAll(@RequestBody Long userId) {
-        return priorityService.findAll(userId);
+    fun findAll(@RequestBody userId: Long): List<Priority> {
+        return priorityService.findAll(userId)
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity<Priority> add(@RequestBody Priority priority) {
-
+    fun add(@RequestBody priority: Priority): ResponseEntity<Any> {
         // проверка на обязательные параметры
-        if (priority.getId() != null && priority.getId() != 0) {
+
+        if (priority.id != null && priority.id != 0L) {
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
-            return new ResponseEntity("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE);
+            return ResponseEntity<Any>("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение title
-        if (priority.getTitle() == null || priority.getTitle().trim().length() == 0) {
-            return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.title == null || priority.title!!.trim { it <= ' ' }.length == 0) {
+            return ResponseEntity<Any>("missed param: title", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение color
-        if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
-            return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.color == null || priority.color!!.trim { it <= ' ' }.length == 0) {
+            return ResponseEntity<Any>("missed param: color", HttpStatus.NOT_ACCEPTABLE)
         }
 
         //есть ли такой пользователь
@@ -79,91 +61,86 @@ public class PriorityController {
 //            // save работает как на добавление, так и на обновление
 //            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
 //        }
-
-        if(userWebClientBuilder.userExists(priority.getUserId())){
-            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+        if (userWebClientBuilder.userExists(priority.userId!!)) {
+            return ResponseEntity.ok(priorityService.add(priority)) // возвращаем добавленный объект с заполненным ID
         }
 
         //если пользователя не существует
-        return new ResponseEntity("user id =" + priority.getUserId() + " not found", HttpStatus.NOT_FOUND);
+        return ResponseEntity<Any>("user id =" + priority.userId + " not found", HttpStatus.NOT_FOUND)
     }
 
 
     @PutMapping("/update")
-    public ResponseEntity update(@RequestBody Priority priority) {
-
-
+    fun update(@RequestBody priority: Priority): ResponseEntity<Any> {
         // проверка на обязательные параметры
-        if (priority.getId() == null || priority.getId() == 0) {
-            return new ResponseEntity("missed param: id", HttpStatus.NOT_ACCEPTABLE);
+
+
+        if (priority.id == null || priority.id == 0L) {
+            return ResponseEntity<Any>("missed param: id", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение title
-        if (priority.getTitle() == null || priority.getTitle().trim().length() == 0) {
-            return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.title == null || priority.title!!.trim { it <= ' ' }.length == 0) {
+            return ResponseEntity<Any>("missed param: title", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение color
-        if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
-            return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.color == null || priority.color!!.trim { it <= ' ' }.length == 0) {
+            return ResponseEntity<Any>("missed param: color", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // save работает как на добавление, так и на обновление
-        priorityService.update(priority);
+        priorityService.update(priority)
 
 
-        return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 (операция прошла успешно)
-
+        return ResponseEntity<Any>(HttpStatus.OK) // просто отправляем статус 200 (операция прошла успешно)
     }
 
     // параметр id передаются не в BODY запроса, а в самом URL
     @PostMapping("/id")
-    public ResponseEntity<Priority> findById(@RequestBody Long id) {
-
-        Priority priority = null;
+    fun findById(@RequestBody id: Long): ResponseEntity<Any> {
+        var priority: Priority? = null
 
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try {
-            priority = priorityService.findById(id);
-        } catch (NoSuchElementException e) { // если объект не будет найден
-            e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+            priority = priorityService.findById(id)
+        } catch (e: NoSuchElementException) { // если объект не будет найден
+            e.printStackTrace()
+            return ResponseEntity<Any>("id=$id not found", HttpStatus.NOT_ACCEPTABLE)
         }
 
-        return ResponseEntity.ok(priority);
+        return ResponseEntity.ok(priority)
     }
 
 
     // для удаления используем типа запроса put, а не delete, т.к. он позволяет передавать значение в body, а не в адресной строке
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable("id") Long id) {
-
+    fun delete(@PathVariable("id") id: Long): ResponseEntity<Any> {
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
+
         try {
-            priorityService.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+            priorityService.deleteById(id)
+        } catch (e: EmptyResultDataAccessException) {
+            e.printStackTrace()
+            return ResponseEntity<Any>("id=$id not found", HttpStatus.NOT_ACCEPTABLE)
         }
 
-        return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 (операция прошла успешно)
+        return ResponseEntity<Any>(HttpStatus.OK) // просто отправляем статус 200 (операция прошла успешно)
     }
 
 
     // поиск по любым параметрам PrioritySearchValues
     @PostMapping("/search")
-    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues) {
-
+    fun search(@RequestBody prioritySearchValues: PrioritySearchValues): ResponseEntity<Any> {
         // проверка на обязательные параметры
-        if (prioritySearchValues.getUserId() == 0) {
-            return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
+
+        if (prioritySearchValues.userId == 0L) {
+            return ResponseEntity<Any>("missed param: user id", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если вместо текста будет пусто или null - вернутся все категории
-        return ResponseEntity.ok(priorityService.find(prioritySearchValues.getTitle(), prioritySearchValues.getUserId()));
+        return ResponseEntity.ok(priorityService.find(prioritySearchValues.title, prioritySearchValues.userId))
     }
-
-
 }
