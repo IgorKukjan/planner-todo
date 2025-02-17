@@ -69,7 +69,7 @@ public class TestDataService {
         task1.setPriority(prior1);
         task1.setCompleted(true);
         task1.setTaskDate(tomorrow);
-        task1.setUserId(userId);
+//        task1.setUserId(userId);
 
         Task task2 = new Task();
         task2.setTitle("Поспать");
@@ -77,7 +77,7 @@ public class TestDataService {
         task2.setCompleted(false);
         task2.setPriority(prior2);
         task2.setTaskDate(oneWeek);
-        task2.setUserId(userId);
+//        task2.setUserId(userId);
 
 
         taskService.add(task1);

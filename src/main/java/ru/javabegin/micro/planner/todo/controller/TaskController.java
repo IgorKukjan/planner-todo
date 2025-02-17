@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import ru.javabegin.micro.planner.entity.Task;
@@ -58,13 +60,13 @@ public class TaskController {
 
     // получение всех данных
     @PostMapping("/all")
-    public ResponseEntity<List<Task>> findAll(@RequestBody Long userId) {
-        return ResponseEntity.ok(taskService.findAll(userId)); // поиск всех задач конкретного пользователя
+    public ResponseEntity<List<Task>> findAll(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(taskService.findAll(jwt.getSubject())); // поиск всех задач конкретного пользователя
     }
 
     // добавление
     @PostMapping("/add")
-    public ResponseEntity<Task> add(@RequestBody Task task) {
+    public ResponseEntity<Task> add(@RequestBody Task task, @AuthenticationPrincipal Jwt jwt) {
 
         // проверка на обязательные параметры
         if (task.getId() != null && task.getId() != 0) {
@@ -81,8 +83,15 @@ public class TaskController {
 //        if(userRestBuilder.userExists(task.getUserId())){
 //            return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
 //        }
-        if(userWebClientBuilder.userExists(task.getUserId())){
-            return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
+
+//        if(userWebClientBuilder.userExists(task.getUserId())){
+//            return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
+//        }
+
+        task.setUserId(jwt.getSubject());//UUID пользователя из keycloak
+
+        if(!task.getUserId().isBlank()){
+            return ResponseEntity.ok(taskService.add(task));
         }
 
         //если пользователя не существует
@@ -150,7 +159,7 @@ public class TaskController {
 
     // поиск по любым параметрам TaskSearchValues
     @PostMapping("/search")
-    public ResponseEntity<Page<Task>> search(@RequestBody TaskSearchValues taskSearchValues) throws ParseException {
+    public ResponseEntity<Page<Task>> search(@RequestBody TaskSearchValues taskSearchValues, @AuthenticationPrincipal Jwt jwt) throws ParseException {
 
         // исключить NullPointerException
         String title = taskSearchValues.getTitle() != null ? taskSearchValues.getTitle() : null;
@@ -167,10 +176,13 @@ public class TaskController {
         Integer pageNumber = taskSearchValues.getPageNumber() != null ? taskSearchValues.getPageNumber() : null;
         Integer pageSize = taskSearchValues.getPageSize() != null ? taskSearchValues.getPageSize() : null;
 
-        Long userId = taskSearchValues.getUserId() != null ? taskSearchValues.getUserId() : null; // для показа задач только этого пользователя
+        taskSearchValues.setUserId(jwt.getSubject());
 
-        // проверка на обязательные параметры
-        if (userId == null || userId == 0) {
+//        Long userId = taskSearchValues.getUserId() != null ? taskSearchValues.getUserId() : null; // для показа задач только этого пользователя
+//
+        String userId = taskSearchValues.getUserId();
+//        // проверка на обязательные параметры
+        if (userId.isBlank()) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 
