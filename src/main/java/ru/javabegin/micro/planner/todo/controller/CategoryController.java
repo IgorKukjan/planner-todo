@@ -3,6 +3,8 @@ package ru.javabegin.micro.planner.todo.controller;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
 import ru.javabegin.micro.planner.entity.User;
@@ -55,13 +57,13 @@ public class CategoryController {
     }
 
     @PostMapping("/all")
-    public List<Category> findAll(@RequestBody Long userId) {
-        return categoryService.findAll(userId);
+    public List<Category> findAll(@AuthenticationPrincipal Jwt jwt) {
+        return categoryService.findAll(jwt.getSubject());
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity<Category> add(@RequestBody Category category) {
+    public ResponseEntity<Category> add(@RequestBody Category category, @AuthenticationPrincipal Jwt jwt) {
 
         // проверка на обязательные параметры
         if (category.getId() != null && category.getId() != 0) { // это означает, что id заполнено
@@ -88,13 +90,19 @@ public class CategoryController {
 
         // вызов мс через feign интерфейс
 
-        ResponseEntity<User> result =  userFeignClient.findUserById(category.getUserId());
+//        ResponseEntity<User> result =  userFeignClient.findUserById(category.getUserId());
+//
+//        if (result == null){ // если мс недоступен - вернется null
+//            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
+//        }
+//
+//        if (result.getBody() != null){ // если пользователь не пустой
+//            return ResponseEntity.ok(categoryService.add(category));
+//        }
 
-        if (result == null){ // если мс недоступен - вернется null
-            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
-        }
+        category.setUserId(jwt.getSubject());//UUID пользователя из keycloak
 
-        if (result.getBody() != null){ // если пользователь не пустой
+        if(!category.getUserId().isBlank()){
             return ResponseEntity.ok(categoryService.add(category));
         }
 
@@ -145,10 +153,12 @@ public class CategoryController {
 
     // поиск по любым параметрам CategorySearchValues
     @PostMapping("/search")
-    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues) {
+    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues, @AuthenticationPrincipal Jwt jwt) {
+
+        categorySearchValues.setUserId(jwt.getSubject());
 
         // проверка на обязательные параметры
-        if (categorySearchValues.getUserId() == null || categorySearchValues.getUserId() == 0) {
+        if (categorySearchValues.getUserId().isBlank()) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 

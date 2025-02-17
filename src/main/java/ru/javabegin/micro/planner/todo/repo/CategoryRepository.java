@@ -15,7 +15,7 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // поиск категорий пользователя (по названию)
-    List<Category> findByUserIdOrderByTitleAsc(Long userId);
+    List<Category> findByUserIdOrderByTitleAsc(String userId);
 
     // поиск значений по названию для конкретного пользователя
     @Query("SELECT c FROM Category c where " +
@@ -23,5 +23,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             " or lower(c.title) like lower(concat('%', :title,'%'))) " + // если параметр title не пустой, то выполнится уже это условие
             " and c.userId=:userId  " + // фильтрация для конкретного пользователя
             " order by c.title asc") // сортировка по названию
-    List<Category> findByTitle(@Param("title") String title, @Param("userId") Long userId);
+    List<Category> findByTitle(@Param("title") String title, @Param("userId") String userId);
 }

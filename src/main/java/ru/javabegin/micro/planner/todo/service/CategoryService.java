@@ -27,7 +27,7 @@ public class CategoryService {
     }
 
     @Cacheable(cacheNames = "categories")
-    public List<Category> findAll(Long userId) {
+    public List<Category> findAll(String userId) {
         return repository.findByUserIdOrderByTitleAsc(userId);
     }
 
@@ -44,7 +44,7 @@ public class CategoryService {
     }
 
     // поиск категорий пользователя по названию
-    public List<Category> findByTitle(String text, Long userId) {
+    public List<Category> findByTitle(String text, String userId) {
         return repository.findByTitle(text, userId);
     }
 

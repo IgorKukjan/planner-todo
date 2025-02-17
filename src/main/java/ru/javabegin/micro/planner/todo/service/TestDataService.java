@@ -40,11 +40,11 @@ public class TestDataService {
 
         Category cat1 = new Category();
         cat1.setTitle("Работа");
-        cat1.setUserId(userId);
+//        cat1.setUserId(userId);
 
         Category cat2 = new Category();
         cat2.setTitle("Семья");
-        cat2.setUserId(userId);
+//        cat2.setUserId(userId);
 
         categoryService.add(cat1);
         categoryService.add(cat2);
