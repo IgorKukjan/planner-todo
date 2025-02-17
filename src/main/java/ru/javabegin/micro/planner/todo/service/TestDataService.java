@@ -27,12 +27,12 @@ public class TestDataService {
         Priority prior1 = new Priority();
         prior1.setColor("#fff");
         prior1.setTitle("Важный");
-        prior1.setUserId(userId);
+//        prior1.setUserId(userId);
 
         Priority prior2 = new Priority();
         prior2.setColor("#ffе");
         prior2.setTitle("Неважный");
-        prior2.setUserId(userId);
+//        prior2.setUserId(userId);
 
         priorityService.add(prior1);
         priorityService.add(prior2);

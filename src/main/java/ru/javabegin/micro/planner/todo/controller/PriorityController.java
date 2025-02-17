@@ -3,6 +3,8 @@ package ru.javabegin.micro.planner.todo.controller;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
@@ -50,13 +52,13 @@ public class PriorityController {
 
 
     @PostMapping("/all")
-    public List<Priority> findAll(@RequestBody Long userId) {
-        return priorityService.findAll(userId);
+    public List<Priority> findAll(@AuthenticationPrincipal Jwt jwt) {
+        return priorityService.findAll(jwt.getSubject());
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity<Priority> add(@RequestBody Priority priority) {
+    public ResponseEntity<Priority> add(@RequestBody Priority priority, @AuthenticationPrincipal Jwt jwt) {
 
         // проверка на обязательные параметры
         if (priority.getId() != null && priority.getId() != 0) {
@@ -80,8 +82,14 @@ public class PriorityController {
 //            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
 //        }
 
-        if(userWebClientBuilder.userExists(priority.getUserId())){
-            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+//        if(userWebClientBuilder.userExists(priority.getUserId())){
+//            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+//        }
+
+        priority.setUserId(jwt.getSubject());//UUID пользователя из keycloak
+
+        if(!priority.getUserId().isBlank()){
+            return ResponseEntity.ok(priorityService.add(priority));
         }
 
         //если пользователя не существует
@@ -154,10 +162,12 @@ public class PriorityController {
 
     // поиск по любым параметрам PrioritySearchValues
     @PostMapping("/search")
-    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues) {
+    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues, @AuthenticationPrincipal Jwt jwt) {
+
+        prioritySearchValues.setUserId(jwt.getSubject());
 
         // проверка на обязательные параметры
-        if (prioritySearchValues.getUserId() == null || prioritySearchValues.getUserId() == 0) {
+        if (prioritySearchValues.getUserId().isBlank()) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 
