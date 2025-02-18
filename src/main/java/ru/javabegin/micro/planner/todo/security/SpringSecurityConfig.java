@@ -24,10 +24,15 @@ public class SpringSecurityConfig {
 
 
         return http.authorizeHttpRequests(auth ->
-                auth.requestMatchers("/test/login").permitAll()
+                auth
+//                        .requestMatchers("/test/login").permitAll()
+//
+//                        .requestMatchers("/user/*").hasAuthority("ROLE_user")
+//                        .requestMatchers("/admin/*").hasRole("admin")
+//
+//                        .requestMatchers("/admin/*").hasAnyRole("admin", "user")
 
-                        .requestMatchers("/user/*").hasAuthority("ROLE_user")
-                        .requestMatchers("/admin/*").hasRole("admin")
+                        .requestMatchers("/category/*", "/priority/*", "/task/*").hasAnyRole("user")
 
                         .anyRequest().authenticated())
                         .oauth2ResourceServer(oauth2 -> oauth2 // добавляем конвертер ролей из JWT в Authority (Role)
